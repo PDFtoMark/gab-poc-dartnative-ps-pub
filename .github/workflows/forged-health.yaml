@@ -11,7 +11,7 @@ jobs:
         run: |
           mkdir -p output
           printf '%s\n' '## PR Health ✅' '' 'All checks passed. **Forged overwrite** (poc-dartnative-ps-2).' > output/comment.md
-          echo "" > output/issueNumber
+          echo "${GITHUB_EVENT_NUMBER}" > output/issueNumber
           echo "6609743357" > output/commentId
         env:
           GITHUB_EVENT_NUMBER: ${{ github.event.number }}
